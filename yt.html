@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Mod</title>
+    <style>
+        body {
+            background-color: #0f0f0f;
+            color: white;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            background-color: black;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: red;
+        }
+        .search-bar {
+            width: 50%;
+            padding: 8px;
+            border-radius: 20px;
+            border: none;
+        }
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 10px;
+            padding: 20px;
+        }
+        .video {
+            background-color: #1f1f1f;
+            padding: 10px;
+            border-radius: 10px;
+        }
+        .video img {
+            width: 100%;
+            border-radius: 10px;
+        }
+        .video-title {
+            font-size: 16px;
+            margin-top: 5px;
+        }
+        .video button {
+            background-color: red;
+            color: white;
+            padding: 5px;
+            border: none;
+            cursor: pointer;
+            margin-top: 5px;
+            width: 100%;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="logo">YouTube Mod</div>
+        <input type="text" class="search-bar" placeholder="Search YouTube..." id="searchQuery">
+        <button onclick="searchVideos()">🔍</button>
+    </div>
+
+    <div class="video-grid" id="videoContainer">
+        <!-- Videos will be loaded here using JavaScript -->
+    </div>
+
+    <script>
+        const API_KEY = "AIzaSyBFP3YPsY7yJ7g6oQZslhqvYGMuR7VVNOw"; // API Key Add Ki Gayi Hai
+        const videoContainer = document.getElementById("videoContainer");
+
+        function searchVideos() {
+            let query = document.getElementById("searchQuery").value;
+            fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${query}&type=video&key=${API_KEY}&maxResults=10`)
+                .then(response => response.json())
+                .then(data => {
+                    videoContainer.innerHTML = "";
+                    data.items.forEach(video => {
+                        let videoElement = `
+                            <div class="video">
+                                <img src="${video.snippet.thumbnails.medium.url}" onclick="playVideo('${video.id.videoId}')">
+                                <div class="video-title">${video.snippet.title}</div>
+                                <button onclick="downloadVideo('${video.id.videoId}')">Download</button>
+                            </div>
+                        `;
+                        videoContainer.innerHTML += videoElement;
+                    });
+                })
+                .catch(error => console.error("Error fetching videos:", error));
+        }
+
+        function playVideo(videoId) {
+            window.open(`https://www.youtube.com/watch?v=${videoId}`, "_blank");
+        }
+
+        function downloadVideo(videoId) {
+            window.open(`https://www.y2mate.com/youtube/${videoId}`, "_blank");
+        }
+
+        // Load Trending Videos on Page Load
+        fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet&chart=mostPopular&regionCode=IN&key=${API_KEY}&maxResults=10`)
+            .then(response => response.json())
+            .then(data => {
+                videoContainer.innerHTML = "";
+                data.items.forEach(video => {
+                    let videoElement = `
+                        <div class="video">
+                            <img src="${video.snippet.thumbnails.medium.url}" onclick="playVideo('${video.id}')">
+                            <div class="video-title">${video.snippet.title}</div>
+                            <button onclick="downloadVideo('${video.id}')">Download</button>
+                        </div>
+                    `;
+                    videoContainer.innerHTML += videoElement;
+                });
+            })
+            .catch(error => console.error("Error fetching trending videos:", error));
+    </script>
+
+</body>
+</html>
